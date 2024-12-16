@@ -31,11 +31,24 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model("usersNew", userSchema)
 // profile
-app.get("/profile", (req, res) => {
-    const cookie = req.cookies
-    console.log(cookie)
-    // validate my token
-    res.send("send data")
+app.get("/profile", async (req, res) => {
+    try {
+        const { token } = req.cookies
+        // check if token exist
+        if (!token) {
+            return res.status(401).json({ message: "Unauthorized" })
+        }
+        // validate my token
+        const { _id } = jwt.verify(token, "adws732budh872bduy23")
+        const user = await User.findById(_id)
+        if (!user) {
+            return res.status(404).json({ message: "User not found" })
+        }
+        res.json({data : "send data", user})
+    } catch (error) {
+        res.status(400).json({error: "error" + error})
+    }
+
 })
 // post signup
 
@@ -85,10 +98,10 @@ app.post("/users/login", async (req, res) => {
         }
 
         // create a jwt token
-        const token = jwt.sign({_id:user._id}, "adws732budh872bduy23")
+        const token = jwt.sign({ _id: user._id }, "adws732budh872bduy23")
 
         // send back response to the user
-        res.cookie("token", "asdhhhuey27sndq02ndiuqye3msoi")
+        res.cookie("token", token)
 
         return res.status(200).json({ msg: "success login", data: user })
 
