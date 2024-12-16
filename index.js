@@ -85,7 +85,7 @@ app.post("/users/login", async (req, res) => {
         }
 
         // create a jwt token
-
+        const token = jwt.sign({_id:user._id}, "adws732budh872bduy23")
 
         // send back response to the user
         res.cookie("token", "asdhhhuey27sndq02ndiuqye3msoi")
